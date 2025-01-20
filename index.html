@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bonchef App Mantenimiento</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
         /* Estilos generales */
         body {
@@ -34,7 +33,6 @@
             background-color: #556b2f;
         }
 
-        /* Estilos para la pantalla de inicio de sesión */
         .login-container {
             display: flex;
             justify-content: center;
@@ -42,10 +40,6 @@
             height: 100vh;
             background-color: #f4f4f9;
             flex-direction: column;
-        }
-
-        .login-container h1 {
-            margin-bottom: 20px;
         }
 
         .login-container form {
@@ -65,16 +59,8 @@
             border-radius: 5px;
         }
 
-        .login-container .error-message {
-            color: red;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            display: none;
-        }
-
-        /* Estilos para la aplicación */
         .app-container {
-            display: flex;
+            display: none;
             flex-direction: column;
             height: 100vh;
         }
@@ -88,29 +74,10 @@
             color: #fff;
         }
 
-        header h1 {
-            margin: 0;
-        }
-
         main {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
-        }
-
-        .warehouse-selector {
-            margin-bottom: 20px;
-        }
-
-        .warehouse-selector label {
-            font-size: 1.1rem;
-        }
-
-        .warehouse-selector select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1rem;
         }
 
         .stock-list {
@@ -140,12 +107,6 @@
             background-color: #f1f1f1;
         }
 
-        .logo {
-            max-width: 200px;
-            height: auto;
-            margin-bottom: 20px;
-        }
-
         .add-item-form {
             margin-bottom: 20px;
             background: #fff;
@@ -153,9 +114,109 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Bonchef App Mantenimiento</h1>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Usuario" required />
+            <input type="password" id="password" placeholder="Contraseña" required />
+            <button type="submit">Iniciar Sesión</button>
+            <p class="error-message" id="errorMessage">Credenciales incorrectas</p>
+        </form>
+    </div>
 
-        .add-item-form input {
-            margin: 5px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-           
+    <div class="app-container" id="appContainer">
+        <header>
+            <h1>Bonchef App</h1>
+            <button id="logoutButton">Cerrar Sesión</button>
+        </header>
+        <main>
+            <section class="add-item-form">
+                <h2>Añadir Artículo</h2>
+                <form id="addItemForm">
+                    <input type="text" id="itemName" placeholder="Nombre del artículo" required />
+                    <input type="number" id="itemStock" placeholder="Cantidad inicial" required />
+                    <input type="number" id="itemMinStock" placeholder="Stock mínimo" required />
+                    <button type="submit">Añadir</button>
+                </form>
+            </section>
+
+            <section class="stock-list">
+                <h2>Inventario</h2>
+                <table id="stockTable">
+                    <thead>
+                        <tr>
+                            <th>Artículo</th>
+                            <th>Cantidad</th>
+                            <th>Stock Mínimo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Los artículos aparecerán aquí -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const appContainer = document.getElementById('appContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const logoutButton = document.getElementById('logoutButton');
+        const addItemForm = document.getElementById('addItemForm');
+        const stockTable = document.getElementById('stockTable').querySelector('tbody');
+
+        const credentials = { username: 'admin', password: '1234' };
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === credentials.username && password === credentials.password) {
+                document.querySelector('.login-container').style.display = 'none';
+                appContainer.style.display = 'flex';
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        logoutButton.addEventListener('click', () => {
+            appContainer.style.display = 'none';
+            document.querySelector('.login-container').style.display = 'flex';
+            loginForm.reset();
+        });
+
+        addItemForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const itemName = document.getElementById('itemName').value;
+            const itemStock = parseInt(document.getElementById('itemStock').value);
+            const itemMinStock = parseInt(document.getElementById('itemMinStock').value);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${itemName}</td>
+                <td>${itemStock}</td>
+                <td>${itemMinStock}</td>
+                <td><button class="delete-button">Eliminar</button></td>
+            `;
+
+            const deleteButton = row.querySelector('.delete-button');
+            deleteButton.addEventListener('click', () => {
+                row.remove();
+            });
+
+            stockTable.appendChild(row);
+            addItemForm.reset();
+
+            if (itemStock < itemMinStock) {
+                alert(`El artículo "${itemName}" está por debajo del stock mínimo. ¡Reponer!`);
+            }
+        });
+    </script>
+</body>
+</html>
